@@ -1,0 +1,67 @@
+@import 'tailwindcss';
+
+:root {
+  --color-bg: #ffffff;
+  --color-surface: #f8f9fa;
+  --color-surface-hover: #f1f3f4;
+  --color-border: #dadce0;
+  --color-text: #1f1f1f;
+  --color-text-muted: #5f6368;
+  --color-accent: #1a73e8;
+  --color-accent-contrast: #ffffff;
+  --color-danger: #d93025;
+
+  /* Настраиваемый фон приложения (см. модуль theming) */
+  --app-bg-image: none;
+  --app-bg-blur: 0px;
+  --app-bg-filter: none;
+
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #131314;
+    --color-surface: #1e1f20;
+    --color-surface-hover: #28292a;
+    --color-border: #3c4043;
+    --color-text: #e8eaed;
+    --color-text-muted: #9aa0a6;
+    --color-accent: #8ab4f8;
+    --color-accent-contrast: #202124;
+    --color-danger: #f28b82;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  color: var(--color-text);
+  background: var(--color-bg);
+}
+
+#root {
+  position: relative;
+  isolation: isolate;
+}
+
+#root::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image: var(--app-bg-image);
+  background-size: cover;
+  background-position: center;
+  filter: var(--app-bg-filter);
+}
