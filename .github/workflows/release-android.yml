@@ -1,0 +1,54 @@
+name: Release Android
+
+# Экспериментально: Android-таргет Tauri v2 требует Android SDK/NDK и дольше собирается,
+# поэтому вынесен в отдельный workflow, чтобы не блокировать релизы Windows/Web.
+# Сборка debug APK (без секретов подписи) — release-подпись добавится в Phase 6.
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+env:
+  NDK_VERSION: '27.0.12077973'
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Install Android NDK
+        run: sdkmanager --install "ndk;${{ env.NDK_VERSION }}"
+
+      - name: Set NDK_HOME
+        run: echo "NDK_HOME=$ANDROID_HOME/ndk/${{ env.NDK_VERSION }}" >> "$GITHUB_ENV"
+
+      - run: npm ci
+
+      - name: Init Android project
+        run: npx tauri android init
+
+      - name: Build debug APK
+        run: npx tauri android build --debug --target aarch64
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: chronica-android-debug
+          path: src-tauri/gen/android/app/build/outputs/apk/**/*.apk
