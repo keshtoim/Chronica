@@ -1,4 +1,6 @@
+import { useEffect } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
+import { useSyncStore } from '@/store/syncStore'
 
 const NAV_ITEMS = [
   { to: '/calendar', label: 'Календарь', icon: '📅' },
@@ -8,6 +10,12 @@ const NAV_ITEMS = [
 ] as const
 
 export function AppShell() {
+  const syncNow = useSyncStore((state) => state.syncNow)
+
+  useEffect(() => {
+    void syncNow()
+  }, [syncNow])
+
   return (
     <div className="flex h-full flex-col">
       <header className="flex h-14 shrink-0 items-center gap-3 border-b border-[var(--color-border)] bg-[var(--color-bg)]/80 px-4 backdrop-blur-sm">
@@ -45,11 +53,26 @@ export function AppShell() {
   )
 }
 
+const STATUS_LABEL: Record<ReturnType<typeof useSyncStore.getState>['status'], string> = {
+  idle: 'Синхронизация: ожидание',
+  syncing: 'Синхронизация…',
+  synced: 'Синхронизировано',
+  error: 'Ошибка синхронизации',
+}
+
 function SyncStatusBadge() {
-  // Заглушка индикатора синхронизации — реальное состояние подключим в Phase 1 (SyncEngine).
+  const status = useSyncStore((state) => state.status)
+  const error = useSyncStore((state) => state.error)
+  const syncNow = useSyncStore((state) => state.syncNow)
+
   return (
-    <span className="rounded-full border border-[var(--color-border)] px-3 py-1 text-xs text-[var(--color-text-muted)]">
-      Синхронизация: локально
-    </span>
+    <button
+      type="button"
+      onClick={() => void syncNow()}
+      title={error ?? undefined}
+      className="rounded-full border border-[var(--color-border)] px-3 py-1 text-xs text-[var(--color-text-muted)] transition-colors hover:bg-[var(--color-surface-hover)]"
+    >
+      {STATUS_LABEL[status]}
+    </button>
   )
 }
