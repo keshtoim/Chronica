@@ -1,10 +1,72 @@
-import { PlaceholderModule } from '@/components/PlaceholderModule'
+import { useState } from 'react'
+import {
+  formatDayMonth,
+  formatMonthYear,
+  getMonthGridDays,
+  getRangeForView,
+  shiftCursor,
+  type CalendarViewMode,
+} from '@/modules/calendar/dateUtils'
+import { useOccurrencesInRange } from '@/modules/calendar/hooks/useOccurrencesInRange'
+import { CalendarToolbar } from '@/modules/calendar/components/CalendarToolbar'
+import { MonthView } from '@/modules/calendar/components/MonthView'
+import { EventModal, type EventModalState } from '@/modules/calendar/components/EventModal'
+import type { EventOccurrence } from '@/modules/calendar/occurrences'
 
 export function CalendarPage() {
+  const [view, setView] = useState<CalendarViewMode>('month')
+  const [cursorDate, setCursorDate] = useState(() => new Date())
+  const [modalState, setModalState] = useState<EventModalState | null>(null)
+
+  const range = getRangeForView(view, cursorDate)
+  const occurrences = useOccurrencesInRange(range.start, range.end)
+
+  function openCreateModal(day: Date) {
+    const start = new Date(day)
+    start.setHours(9, 0, 0, 0)
+    const end = new Date(start)
+    end.setHours(10, 0, 0, 0)
+    setModalState({ mode: 'create', start, end, allDay: false })
+  }
+
+  function openEditModal(occurrence: EventOccurrence) {
+    setModalState({ mode: 'edit', occurrence })
+  }
+
+  const label =
+    view === 'day'
+      ? formatDayMonth(cursorDate) + ' ' + cursorDate.getFullYear()
+      : formatMonthYear(cursorDate)
+
   return (
-    <PlaceholderModule
-      title="Календарь"
-      description="Месяц, неделя, день и повестка дня появятся здесь в Phase 3."
-    />
+    <div className="flex h-full flex-col">
+      <CalendarToolbar
+        view={view}
+        onViewChange={setView}
+        label={label}
+        onPrev={() => setCursorDate((date) => shiftCursor(view, date, -1))}
+        onNext={() => setCursorDate((date) => shiftCursor(view, date, 1))}
+        onToday={() => setCursorDate(new Date())}
+        onCreate={() => openCreateModal(new Date())}
+      />
+
+      <div className="min-h-0 flex-1 overflow-auto">
+        {view === 'month' ? (
+          <MonthView
+            days={getMonthGridDays(cursorDate)}
+            cursorDate={cursorDate}
+            occurrences={occurrences}
+            onDayClick={openCreateModal}
+            onEventClick={openEditModal}
+          />
+        ) : (
+          <div className="p-8 text-[var(--color-text-muted)]">
+            Этот режим отображения будет добавлен следующим шагом.
+          </div>
+        )}
+      </div>
+
+      {modalState && <EventModal state={modalState} onClose={() => setModalState(null)} />}
+    </div>
   )
 }
