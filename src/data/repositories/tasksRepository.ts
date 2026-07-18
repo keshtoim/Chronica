@@ -13,9 +13,15 @@ export const tasksRepository = {
     return all.filter((task) => task.listId === listId)
   },
 
-  /** Ключ ручной сортировки для новой задачи в конце списка (шаг 1000, чтобы вставлять между без переиндексации). */
-  async nextSortOrder(listId: string): Promise<number> {
-    const siblings = await this.listByList(listId)
+  /**
+   * Ключ ручной сортировки для новой (под)задачи в конце своей группы (шаг 1000,
+   * чтобы вставлять между соседями без переиндексации). Группа — задачи с тем же
+   * parentTaskId: у подзадач и задач верхнего уровня раздельные пространства сортировки.
+   */
+  async nextSortOrder(listId: string, parentTaskId: string | null = null): Promise<number> {
+    const siblings = (await this.listByList(listId)).filter(
+      (task) => (task.parentTaskId ?? null) === parentTaskId,
+    )
     if (siblings.length === 0) return SORT_ORDER_STEP
     return Math.max(...siblings.map((task) => task.sortOrder)) + SORT_ORDER_STEP
   },

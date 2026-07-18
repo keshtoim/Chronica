@@ -8,6 +8,16 @@ import { nowIso } from '@/data/db'
  * remove() — это soft delete (tombstone), нужен для last-write-wins слияния при синхронизации.
  */
 export function createRepository<T extends BaseEntity>(table: EntityTable<T, 'id'>) {
+  // Dexie не может вывести IDType<T, 'id'> из обобщённого T — id заведомо string (BaseEntity.id).
+  // Перетипируем сам объект table (а не отдельные методы), чтобы вызовы ниже оставались `untyped.method(...)` —
+  // если вместо этого извлечь метод в переменную (`const fn = table.update`) и вызвать `fn(...)` отдельно,
+  // Dexie теряет свой `this` и падает изнутри с "Cannot read properties of undefined".
+  const untyped = table as unknown as {
+    get(id: string): Promise<T | undefined>
+    update(id: string, changes: Partial<T>): Promise<number>
+    delete(id: string): Promise<void>
+  }
+
   return {
     async list(): Promise<T[]> {
       const all = await table.toArray()
@@ -15,8 +25,7 @@ export function createRepository<T extends BaseEntity>(table: EntityTable<T, 'id
     },
 
     async get(id: string): Promise<T | undefined> {
-      // Dexie не может вывести IDType<T, 'id'> из обобщённого T — id заведомо string (BaseEntity.id).
-      const item = await (table.get as (id: string) => Promise<T | undefined>)(id)
+      const item = await untyped.get(id)
       return item && !item.deleted ? item : undefined
     },
 
@@ -33,18 +42,16 @@ export function createRepository<T extends BaseEntity>(table: EntityTable<T, 'id
     },
 
     async update(id: string, changes: Partial<Omit<T, 'id' | 'createdAt'>>): Promise<void> {
-      const update = table.update as (id: string, changes: Partial<T>) => Promise<number>
-      await update(id, { ...changes, updatedAt: nowIso() } as Partial<T>)
+      await untyped.update(id, { ...changes, updatedAt: nowIso() } as Partial<T>)
     },
 
     async remove(id: string): Promise<void> {
-      const update = table.update as (id: string, changes: Partial<T>) => Promise<number>
-      await update(id, { deleted: true, updatedAt: nowIso() } as Partial<T>)
+      await untyped.update(id, { deleted: true, updatedAt: nowIso() } as Partial<T>)
     },
 
     /** Полное удаление записи — использовать только для очистки старых tombstone'ов. */
     async hardRemove(id: string): Promise<void> {
-      await (table.delete as (id: string) => Promise<void>)(id)
+      await untyped.delete(id)
     },
   }
 }
