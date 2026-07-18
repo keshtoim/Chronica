@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { useSyncStore } from '@/store/syncStore'
+import { runDailyPenaltyCheck } from '@/modules/habits/dailyPenaltyCheck'
 
 const NAV_ITEMS = [
   { to: '/calendar', label: 'Календарь', icon: '📅' },
@@ -14,6 +15,7 @@ export function AppShell() {
 
   useEffect(() => {
     void syncNow()
+    void runDailyPenaltyCheck()
   }, [syncNow])
 
   return (

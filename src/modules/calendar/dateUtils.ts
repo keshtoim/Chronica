@@ -100,6 +100,9 @@ export function toDateInputValue(date: Date): string {
   return `${year}-${month}-${day}`
 }
 
+/** Алиас toDateInputValue — используется как ключ дня (recurrenceExceptions, HabitCompletion.date). */
+export const toDateKey = toDateInputValue
+
 export function toTimeInputValue(date: Date): string {
   const hours = String(date.getHours()).padStart(2, '0')
   const minutes = String(date.getMinutes()).padStart(2, '0')
