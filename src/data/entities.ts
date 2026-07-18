@@ -133,4 +133,6 @@ export interface BackgroundSettings {
 export interface AppSettings extends BaseEntity {
   background: BackgroundSettings
   taskSortMode: TaskSortMode
+  /** ISO-дата последней проверки пропущенных daily-привычек (штраф HP начисляется не чаще раза в день). */
+  lastPenaltyCheckDate?: string
 }

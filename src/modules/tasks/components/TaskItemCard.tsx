@@ -1,6 +1,7 @@
 import { useState, type FormEvent, type KeyboardEvent } from 'react'
 import type { TaskEntity } from '@/data/entities'
 import { tasksRepository } from '@/data/repositories/tasksRepository'
+import { grantReward } from '@/modules/gamification/engine'
 
 interface Props {
   task: TaskEntity
@@ -21,6 +22,7 @@ export function TaskItemCard({ task, parentTitle }: Props) {
       completed,
       completedAt: completed ? new Date().toISOString() : undefined,
     })
+    if (completed) await grantReward('task', task.id)
   }
 
   async function saveTitle() {
