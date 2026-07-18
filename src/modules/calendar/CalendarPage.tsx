@@ -12,6 +12,7 @@ import { useOccurrencesInRange } from '@/modules/calendar/hooks/useOccurrencesIn
 import { CalendarToolbar } from '@/modules/calendar/components/CalendarToolbar'
 import { MonthView } from '@/modules/calendar/components/MonthView'
 import { TimeGridView } from '@/modules/calendar/components/TimeGridView'
+import { AgendaView } from '@/modules/calendar/components/AgendaView'
 import { EventModal, type EventModalState } from '@/modules/calendar/components/EventModal'
 import type { EventOccurrence } from '@/modules/calendar/occurrences'
 
@@ -74,11 +75,7 @@ export function CalendarPage() {
             onEventClick={openEditModal}
           />
         )}
-        {view === 'agenda' && (
-          <div className="p-8 text-[var(--color-text-muted)]">
-            Повестка дня будет добавлена следующим шагом.
-          </div>
-        )}
+        {view === 'agenda' && <AgendaView occurrences={occurrences} onEventClick={openEditModal} />}
       </div>
 
       {modalState && <EventModal state={modalState} onClose={() => setModalState(null)} />}
