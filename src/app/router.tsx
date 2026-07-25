@@ -4,6 +4,7 @@ import { CalendarPage } from '@/modules/calendar/CalendarPage'
 import { TasksPage } from '@/modules/tasks/TasksPage'
 import { HabitsPage } from '@/modules/habits/HabitsPage'
 import { ProfilePage } from '@/modules/gamification/ProfilePage'
+import { SettingsPage } from '@/modules/settings/SettingsPage'
 
 export const router = createHashRouter([
   {
@@ -15,6 +16,7 @@ export const router = createHashRouter([
       { path: 'tasks', element: <TasksPage /> },
       { path: 'habits', element: <HabitsPage /> },
       { path: 'profile', element: <ProfilePage /> },
+      { path: 'settings', element: <SettingsPage /> },
     ],
   },
 ])

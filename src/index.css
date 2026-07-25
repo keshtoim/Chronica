@@ -11,9 +11,9 @@
   --color-accent-contrast: #ffffff;
   --color-danger: #d93025;
 
-  /* Настраиваемый фон приложения (см. модуль theming) */
+  /* Настраиваемый фон приложения (см. модуль theming/settings). --app-bg-filter уже
+     включает blur() первым слагаемым — единая цепочка filter, а не два отдельных свойства. */
   --app-bg-image: none;
-  --app-bg-blur: 0px;
   --app-bg-filter: none;
 
   color-scheme: light dark;
@@ -58,7 +58,9 @@ body {
 #root::before {
   content: '';
   position: fixed;
-  inset: 0;
+  /* Небольшой запас за пределами вьюпорта + масштаб — чтобы размытые края фона (filter: blur)
+     не создавали светлую кайму по границе экрана. */
+  inset: -20px;
   z-index: -1;
   background-image: var(--app-bg-image);
   background-size: cover;
