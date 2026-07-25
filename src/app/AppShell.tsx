@@ -2,16 +2,19 @@ import { useEffect } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { useSyncStore } from '@/store/syncStore'
 import { runDailyPenaltyCheck } from '@/modules/habits/dailyPenaltyCheck'
+import { useApplyBackgroundSettings } from '@/modules/settings/hooks/useApplyBackgroundSettings'
 
 const NAV_ITEMS = [
   { to: '/calendar', label: 'Календарь', icon: '📅' },
   { to: '/tasks', label: 'Задачи', icon: '✅' },
   { to: '/habits', label: 'Привычки', icon: '🔥' },
   { to: '/profile', label: 'Профиль', icon: '🧙' },
+  { to: '/settings', label: 'Настройки', icon: '⚙️' },
 ] as const
 
 export function AppShell() {
   const syncNow = useSyncStore((state) => state.syncNow)
+  useApplyBackgroundSettings()
 
   useEffect(() => {
     void syncNow()
