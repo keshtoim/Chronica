@@ -1,5 +1,6 @@
 import { formatDayHeader, isSameDay } from '@/modules/calendar/dateUtils'
 import type { EventOccurrence } from '@/modules/calendar/occurrences'
+import { MediaImage } from '@/media/MediaImage'
 
 interface Props {
   occurrences: EventOccurrence[] | undefined
@@ -57,6 +58,13 @@ export function AgendaView({ occurrences, onEventClick }: Props) {
                 <span className="w-28 shrink-0 text-xs text-[var(--color-text-muted)]">
                   {formatTimeRange(occurrence)}
                 </span>
+                {occurrence.event.photo && (
+                  <MediaImage
+                    blobKey={occurrence.event.photo.blobKey}
+                    alt=""
+                    className="h-8 w-12 shrink-0 rounded object-cover"
+                  />
+                )}
                 <span className="truncate">{occurrence.event.title}</span>
               </button>
             ))}

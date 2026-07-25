@@ -7,6 +7,8 @@ import {
   toDateInputValue,
   toTimeInputValue,
 } from '@/modules/calendar/dateUtils'
+import { PhotoPicker } from '@/media/PhotoPicker'
+import type { MediaRef } from '@/data/entities'
 
 export type EventModalState =
   | { mode: 'create'; start: Date; end: Date; allDay: boolean }
@@ -49,6 +51,7 @@ export function EventModal({ state, onClose }: Props) {
   const [endTime, setEndTime] = useState(toTimeInputValue(initialEnd))
   const [color, setColor] = useState(existing?.color ?? COLOR_PRESETS[0].value)
   const [recurrenceRule, setRecurrenceRule] = useState(existing?.recurrenceRule ?? '')
+  const [photo, setPhoto] = useState<MediaRef | undefined>(existing?.photo)
   const [error, setError] = useState<string | null>(null)
 
   function computeStartEnd(): { start: Date; end: Date } {
@@ -85,6 +88,7 @@ export function EventModal({ state, onClose }: Props) {
       allDay,
       color,
       recurrenceRule: recurrenceRule || undefined,
+      photo,
     }
 
     if (state.mode === 'edit') {
@@ -210,6 +214,14 @@ export function EventModal({ state, onClose }: Props) {
           placeholder="Заметки"
           rows={3}
           className="resize-none rounded-md border border-[var(--color-border)] bg-transparent px-3 py-2 text-sm outline-none"
+        />
+
+        <PhotoPicker
+          value={photo}
+          aspect={16 / 9}
+          onChange={setPhoto}
+          label="Фото"
+          thumbnailClassName="h-10 w-16 rounded-md object-cover"
         />
 
         {error && <p className="text-sm text-[var(--color-danger)]">{error}</p>}

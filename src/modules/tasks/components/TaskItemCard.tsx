@@ -1,7 +1,9 @@
 import { useState, type FormEvent, type KeyboardEvent } from 'react'
-import type { TaskEntity } from '@/data/entities'
+import type { MediaRef, TaskEntity } from '@/data/entities'
 import { tasksRepository } from '@/data/repositories/tasksRepository'
 import { grantReward } from '@/modules/gamification/engine'
+import { MediaImage } from '@/media/MediaImage'
+import { PhotoPicker } from '@/media/PhotoPicker'
 
 interface Props {
   task: TaskEntity
@@ -15,6 +17,7 @@ export function TaskItemCard({ task, parentTitle }: Props) {
   const [showNotes, setShowNotes] = useState(Boolean(task.notes))
   const [showSubtaskInput, setShowSubtaskInput] = useState(false)
   const [subtaskTitle, setSubtaskTitle] = useState('')
+  const [showPhotoPicker, setShowPhotoPicker] = useState(false)
 
   async function toggleCompleted() {
     const completed = !task.completed
@@ -49,6 +52,10 @@ export function TaskItemCard({ task, parentTitle }: Props) {
 
   async function saveNotes(value: string) {
     await tasksRepository.update(task.id, { notes: value || undefined })
+  }
+
+  async function savePhoto(photo: MediaRef | undefined) {
+    await tasksRepository.update(task.id, { photo })
   }
 
   async function handleDelete() {
@@ -88,6 +95,14 @@ export function TaskItemCard({ task, parentTitle }: Props) {
         >
           {task.completed ? '✓' : ''}
         </button>
+
+        {task.photo && (
+          <MediaImage
+            blobKey={task.photo.blobKey}
+            alt=""
+            className="h-10 w-10 shrink-0 rounded-md object-cover"
+          />
+        )}
 
         <div className="min-w-0 flex-1">
           {parentTitle && (
@@ -144,6 +159,13 @@ export function TaskItemCard({ task, parentTitle }: Props) {
             </button>
             <button
               type="button"
+              onClick={() => setShowPhotoPicker((value) => !value)}
+              className="hover:underline"
+            >
+              Фото
+            </button>
+            <button
+              type="button"
               onClick={() => void handleDelete()}
               className="ml-auto text-[var(--color-danger)] hover:underline"
             >
@@ -159,6 +181,12 @@ export function TaskItemCard({ task, parentTitle }: Props) {
               rows={2}
               className="mt-1 w-full resize-none rounded-md border border-[var(--color-border)] bg-transparent p-1.5 text-xs outline-none"
             />
+          )}
+
+          {showPhotoPicker && (
+            <div className="mt-1">
+              <PhotoPicker value={task.photo} aspect={1} onChange={(ref) => void savePhoto(ref)} />
+            </div>
           )}
 
           {showSubtaskInput && (
