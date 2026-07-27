@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# Local secrets/keys — never commit (see secrets-local/README if present)
+secrets-local/
+*.keystore
+*.jks
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
