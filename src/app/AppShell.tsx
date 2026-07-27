@@ -5,10 +5,10 @@ import { runDailyPenaltyCheck } from '@/modules/habits/dailyPenaltyCheck'
 import { useApplyBackgroundSettings } from '@/modules/settings/hooks/useApplyBackgroundSettings'
 
 const NAV_ITEMS = [
+  { to: '/dashboard', label: 'Главная', icon: '🏠' },
   { to: '/calendar', label: 'Календарь', icon: '📅' },
   { to: '/tasks', label: 'Задачи', icon: '✅' },
   { to: '/habits', label: 'Привычки', icon: '🔥' },
-  { to: '/profile', label: 'Профиль', icon: '🧙' },
   { to: '/settings', label: 'Настройки', icon: '⚙️' },
 ] as const
 

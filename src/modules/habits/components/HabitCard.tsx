@@ -15,9 +15,11 @@ function frequencyLabel(habit: HabitEntity): string {
 
 interface Props {
   habit: HabitEntity
+  /** Компактный вид для дашборда — без heatmap и удаления, только суть: название, стрик, отметка. */
+  compact?: boolean
 }
 
-export function HabitCard({ habit }: Props) {
+export function HabitCard({ habit, compact = false }: Props) {
   const todayKey = toDateKey(new Date())
   const doneToday = habit.completions.some((entry) => entry.date === todayKey && entry.count > 0)
 
@@ -27,45 +29,58 @@ export function HabitCard({ habit }: Props) {
   }
 
   return (
-    <div className="rounded-xl border border-[var(--color-border)] p-4">
+    <div
+      className={
+        compact
+          ? 'rounded-lg border border-[var(--color-border)] p-3'
+          : 'rounded-xl border border-[var(--color-border)] p-4'
+      }
+    >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h3 className="font-medium">{habit.title}</h3>
-          <p className="text-xs text-[var(--color-text-muted)]">{frequencyLabel(habit)}</p>
+          <h3 className={compact ? 'text-sm font-medium' : 'font-medium'}>{habit.title}</h3>
+          {!compact && (
+            <p className="text-xs text-[var(--color-text-muted)]">{frequencyLabel(habit)}</p>
+          )}
         </div>
         <button
           type="button"
           onClick={() => void toggleHabitCompletion(habit)}
           className={[
-            'shrink-0 rounded-full px-3 py-1.5 text-sm font-medium transition-colors',
+            'shrink-0 rounded-full font-medium transition-colors',
+            compact ? 'px-2.5 py-1 text-xs' : 'px-3 py-1.5 text-sm',
             doneToday
               ? 'bg-[var(--color-accent)] text-[var(--color-accent-contrast)]'
               : 'border border-[var(--color-border)] hover:bg-[var(--color-surface-hover)]',
           ].join(' ')}
         >
-          {doneToday ? '✓ Выполнено сегодня' : 'Отметить выполненным'}
+          {doneToday ? '✓' : compact ? 'Отметить' : 'Отметить выполненным'}
         </button>
       </div>
 
-      <div className="mt-3 flex items-center gap-4 text-xs text-[var(--color-text-muted)]">
+      <div className="mt-2 flex items-center gap-4 text-xs text-[var(--color-text-muted)]">
         <span>🔥 Стрик: {habit.currentStreak}</span>
-        <span>🏆 Лучший: {habit.bestStreak}</span>
+        {!compact && <span>🏆 Лучший: {habit.bestStreak}</span>}
       </div>
 
-      <div className="mt-3 overflow-x-auto">
-        <HabitHeatmap
-          habit={habit}
-          onToggleDate={(date) => void toggleHabitCompletion(habit, date)}
-        />
-      </div>
+      {!compact && (
+        <>
+          <div className="mt-3 overflow-x-auto">
+            <HabitHeatmap
+              habit={habit}
+              onToggleDate={(date) => void toggleHabitCompletion(habit, date)}
+            />
+          </div>
 
-      <button
-        type="button"
-        onClick={() => void handleDelete()}
-        className="mt-3 text-xs text-[var(--color-danger)] hover:underline"
-      >
-        Удалить привычку
-      </button>
+          <button
+            type="button"
+            onClick={() => void handleDelete()}
+            className="mt-3 text-xs text-[var(--color-danger)] hover:underline"
+          >
+            Удалить привычку
+          </button>
+        </>
+      )}
     </div>
   )
 }
