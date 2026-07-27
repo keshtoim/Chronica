@@ -38,5 +38,15 @@
     "android": {
       "debugApplicationIdSuffix": ".debug"
     }
+  },
+  "plugins": {
+    "deep-link": {
+      "mobile": [
+        {
+          "scheme": ["chronica"],
+          "appLink": false
+        }
+      ]
+    }
   }
 }

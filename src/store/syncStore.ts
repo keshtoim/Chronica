@@ -4,29 +4,29 @@ import { GoogleDriveSyncProvider } from '@/sync/GoogleDriveSyncProvider'
 import { SyncEngine } from '@/sync/SyncEngine'
 import { webGoogleTokenProvider } from '@/sync/google/webTokenProvider'
 import { desktopGoogleTokenProvider } from '@/sync/google/desktopTokenProvider'
+import { mobileGoogleTokenProvider } from '@/sync/google/mobileTokenProvider'
 import { detectPlatform } from '@/sync/google/platform'
 import type { GoogleTokenProvider } from '@/sync/google/tokenProvider'
 
 export type SyncBackend = 'mock-local' | 'google-drive'
 
-/** null — платформа пока не поддерживает Google Drive sync (mobile — следующий шаг). */
-function getGoogleTokenProvider(): GoogleTokenProvider | null {
+function getGoogleTokenProvider(): GoogleTokenProvider {
   const platform = detectPlatform()
-  if (platform === 'web') return webGoogleTokenProvider
   if (platform === 'tauri-desktop') return desktopGoogleTokenProvider
-  return null
+  if (platform === 'tauri-mobile') return mobileGoogleTokenProvider
+  return webGoogleTokenProvider
 }
 
 const activeTokenProvider = getGoogleTokenProvider()
 
 function createEngine(backend: SyncBackend): SyncEngine {
-  if (backend === 'google-drive' && activeTokenProvider) {
+  if (backend === 'google-drive') {
     return new SyncEngine(new GoogleDriveSyncProvider(activeTokenProvider))
   }
   return new SyncEngine(new MockLocalSyncProvider())
 }
 
-const initialBackend: SyncBackend = activeTokenProvider?.isConnected()
+const initialBackend: SyncBackend = activeTokenProvider.isConnected()
   ? 'google-drive'
   : 'mock-local'
 let engine = createEngine(initialBackend)
@@ -60,13 +60,6 @@ export const useSyncStore = create<SyncState>((set, get) => ({
   },
 
   async connectGoogleDrive() {
-    if (!activeTokenProvider) {
-      set({
-        error: `Синхронизация с Google Drive пока не поддерживается на этой платформе (${detectPlatform()})`,
-      })
-      return
-    }
-
     set({ status: 'syncing', error: null })
     try {
       await activeTokenProvider.getAccessToken({ interactive: true })
@@ -79,7 +72,7 @@ export const useSyncStore = create<SyncState>((set, get) => ({
   },
 
   disconnectGoogleDrive() {
-    activeTokenProvider?.disconnect()
+    activeTokenProvider.disconnect()
     engine = createEngine('mock-local')
     set({ backend: 'mock-local', status: 'idle', error: null })
   },

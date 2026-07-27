@@ -27,3 +27,6 @@ tauri-plugin-log = "2"
 # и открытие системного браузера для экрана согласия Google.
 tauri-plugin-oauth = "2"
 tauri-plugin-opener = "2"
+# Google Drive sync (mobile OAuth): custom-scheme deep link как redirect_uri на Android
+# (loopback там deprecated Google'ом).
+tauri-plugin-deep-link = "2"

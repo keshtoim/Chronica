@@ -15,6 +15,7 @@ async fn start_oauth_server(window: Window) -> Result<u16, String> {
 pub fn run() {
   tauri::Builder::default()
     .plugin(tauri_plugin_opener::init())
+    .plugin(tauri_plugin_deep_link::init())
     .invoke_handler(tauri::generate_handler![start_oauth_server])
     .setup(|app| {
       if cfg!(debug_assertions) {
