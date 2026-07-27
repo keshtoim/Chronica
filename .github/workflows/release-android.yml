@@ -12,6 +12,9 @@ on:
 env:
   NDK_VERSION: '27.0.12077973'
 
+permissions:
+  contents: write
+
 jobs:
   build-android:
     runs-on: ubuntu-latest
@@ -52,3 +55,15 @@ jobs:
         with:
           name: chronica-android-debug
           path: src-tauri/gen/android/app/build/outputs/apk/**/*.apk
+
+      # Прикрепляет APK к тому же черновику релиза, что и Windows-сборка (по тегу).
+      # Создаёт релиз, если Windows-workflow ещё не успел (порядок между workflow'ами не гарантирован).
+      - name: Attach APK to release draft
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ github.ref_name }}
+          draft: true
+          files: src-tauri/gen/android/app/build/outputs/apk/**/*.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
