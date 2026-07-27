@@ -2,6 +2,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { appSettingsRepository } from '@/data/repositories/appSettingsRepository'
 import { mediaRepository } from '@/data/repositories/mediaRepository'
 import { PhotoPicker } from '@/media/PhotoPicker'
+import { useSyncStore } from '@/store/syncStore'
 import type { AppSettings, BackgroundFilters, MediaRef } from '@/data/entities'
 
 const FILTER_CONFIG: { key: keyof BackgroundFilters; label: string; min: number; max: number }[] = [
@@ -40,7 +41,9 @@ export function SettingsPage() {
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-4 p-4">
-      <h1 className="text-lg font-medium">Настройки внешнего вида</h1>
+      <h1 className="text-lg font-medium">Настройки</h1>
+
+      <SyncSection />
 
       <div className="rounded-xl border border-[var(--color-border)] p-4">
         <h2 className="mb-3 font-medium">Фон приложения</h2>
@@ -100,6 +103,65 @@ export function SettingsPage() {
           Сбросить размытие и фильтры
         </button>
       </div>
+    </div>
+  )
+}
+
+function SyncSection() {
+  const backend = useSyncStore((state) => state.backend)
+  const status = useSyncStore((state) => state.status)
+  const lastSyncedAt = useSyncStore((state) => state.lastSyncedAt)
+  const error = useSyncStore((state) => state.error)
+  const connectGoogleDrive = useSyncStore((state) => state.connectGoogleDrive)
+  const disconnectGoogleDrive = useSyncStore((state) => state.disconnectGoogleDrive)
+  const syncNow = useSyncStore((state) => state.syncNow)
+
+  return (
+    <div className="rounded-xl border border-[var(--color-border)] p-4">
+      <h2 className="mb-3 font-medium">Синхронизация</h2>
+
+      {backend === 'google-drive' ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-sm text-[var(--color-text-muted)]">
+            Подключено к Google Drive
+            {lastSyncedAt &&
+              ` · последняя синхронизация ${new Date(lastSyncedAt).toLocaleTimeString()}`}
+          </span>
+          <button
+            type="button"
+            onClick={() => void syncNow()}
+            disabled={status === 'syncing'}
+            className="rounded-full border border-[var(--color-border)] px-3 py-1.5 text-xs hover:bg-[var(--color-surface-hover)] disabled:opacity-50"
+          >
+            {status === 'syncing' ? 'Синхронизация…' : 'Синхронизировать сейчас'}
+          </button>
+          <button
+            type="button"
+            onClick={disconnectGoogleDrive}
+            className="text-xs text-[var(--color-danger)] hover:underline"
+          >
+            Отключить
+          </button>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-2">
+          <p className="text-sm text-[var(--color-text-muted)]">
+            Сейчас данные хранятся только локально. Подключи Google-аккаунт, чтобы синхронизировать
+            задачи, календарь и привычки между устройствами через скрытую папку приложения на твоём
+            Google Диске.
+          </p>
+          <button
+            type="button"
+            onClick={() => void connectGoogleDrive()}
+            disabled={status === 'syncing'}
+            className="w-fit rounded-full bg-[var(--color-accent)] px-4 py-1.5 text-sm font-medium text-[var(--color-accent-contrast)] disabled:opacity-50"
+          >
+            {status === 'syncing' ? 'Подключение…' : 'Подключить Google Drive'}
+          </button>
+        </div>
+      )}
+
+      {error && <p className="mt-2 text-sm text-[var(--color-danger)]">{error}</p>}
     </div>
   )
 }
