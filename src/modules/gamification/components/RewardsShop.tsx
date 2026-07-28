@@ -37,8 +37,8 @@ export function RewardsShop({ profile }: Props) {
   }
 
   return (
-    <div className="rounded-xl border border-[var(--color-border)] p-4">
-      <h2 className="mb-3 font-medium">Магазин наград</h2>
+    <div className="rounded-card border border-[var(--color-border)] bg-[var(--color-glass)] p-4 shadow-soft backdrop-blur-md">
+      <h2 className="mb-3 font-semibold">Магазин наград</h2>
 
       {profile.rewards.length === 0 ? (
         <p className="text-sm text-[var(--color-text-muted)]">
@@ -49,16 +49,19 @@ export function RewardsShop({ profile }: Props) {
           {profile.rewards.map((reward) => (
             <div
               key={reward.id}
-              className="flex items-center justify-between gap-3 rounded-md border border-[var(--color-border)] px-3 py-2"
+              className="flex items-center justify-between gap-3 rounded-button border border-[var(--color-border)] px-3 py-2"
             >
               <span className="text-sm">{reward.name}</span>
               <div className="flex items-center gap-2">
-                <span className="text-xs text-[var(--color-text-muted)]">💰 {reward.cost}</span>
+                <span className="text-xs" style={{ color: 'var(--color-gold)' }}>
+                  💰 {reward.cost}
+                </span>
                 <button
                   type="button"
                   onClick={() => void handlePurchase(reward.id)}
                   disabled={profile.gold < reward.cost}
-                  className="rounded-full bg-[var(--color-accent)] px-3 py-1 text-xs font-medium text-[var(--color-accent-contrast)] disabled:opacity-40"
+                  style={{ background: 'var(--gradient-primary)' }}
+                  className="rounded-button px-3 py-1 text-xs font-medium text-[var(--color-accent-contrast)] shadow-soft disabled:opacity-40"
                 >
                   Купить
                 </button>
@@ -82,18 +85,18 @@ export function RewardsShop({ profile }: Props) {
           value={name}
           onChange={(event) => setName(event.target.value)}
           placeholder="Название награды"
-          className="flex-1 rounded-md border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-sm outline-none"
+          className="flex-1 rounded-input border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-sm outline-none"
         />
         <input
           type="number"
           min={1}
           value={cost}
           onChange={(event) => setCost(Number(event.target.value))}
-          className="w-20 rounded-md border border-[var(--color-border)] bg-transparent px-2 py-1.5 text-sm outline-none"
+          className="w-20 rounded-input border border-[var(--color-border)] bg-transparent px-2 py-1.5 text-sm outline-none"
         />
         <button
           type="submit"
-          className="rounded-full border border-[var(--color-border)] px-3 py-1.5 text-sm hover:bg-[var(--color-surface-hover)]"
+          className="rounded-button border border-[var(--color-border)] px-3 py-1.5 text-sm hover:bg-[var(--color-surface-hover)]"
         >
           Добавить
         </button>

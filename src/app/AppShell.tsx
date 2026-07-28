@@ -24,25 +24,28 @@ export function AppShell() {
 
   return (
     <div className="flex h-full flex-col">
-      <header className="flex h-14 shrink-0 items-center gap-3 border-b border-[var(--color-border)] bg-[var(--color-bg)]/80 px-4 backdrop-blur-sm">
-        <span className="text-lg font-medium">Chronica</span>
+      <header className="flex h-14 shrink-0 items-center gap-3 border-b border-[var(--color-border)] bg-[var(--color-glass)] px-4 backdrop-blur-md">
+        <span className="text-lg font-semibold">Chronica</span>
         <div className="flex-1" />
         <SyncStatusBadge />
       </header>
 
       <div className="flex min-h-0 flex-1">
-        <nav className="hidden w-56 shrink-0 flex-col gap-1 border-r border-[var(--color-border)] bg-[var(--color-bg)]/80 p-3 backdrop-blur-sm md:flex">
+        <nav className="hidden w-56 shrink-0 flex-col gap-1 border-r border-[var(--color-border)] bg-[var(--color-glass)] p-3 backdrop-blur-md md:flex">
           {NAV_ITEMS.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
               className={({ isActive }) =>
                 [
-                  'flex items-center gap-3 rounded-full px-4 py-2 text-sm font-medium transition-colors',
+                  'flex items-center gap-3 rounded-button px-4 py-2 text-sm font-medium transition-all',
                   isActive
-                    ? 'bg-[var(--color-accent)] text-[var(--color-accent-contrast)]'
+                    ? 'text-[var(--color-accent-contrast)] shadow-soft'
                     : 'text-[var(--color-text)] hover:bg-[var(--color-surface-hover)]',
                 ].join(' ')
+              }
+              style={({ isActive }) =>
+                isActive ? { background: 'var(--gradient-primary)' } : undefined
               }
             >
               <span aria-hidden="true">{item.icon}</span>
@@ -56,7 +59,7 @@ export function AppShell() {
         </main>
       </div>
 
-      <nav className="flex shrink-0 items-stretch border-t border-[var(--color-border)] bg-[var(--color-bg)]/80 backdrop-blur-sm md:hidden">
+      <nav className="flex shrink-0 items-stretch border-t border-[var(--color-border)] bg-[var(--color-glass)] backdrop-blur-md md:hidden">
         {NAV_ITEMS.map((item) => (
           <NavLink
             key={item.to}
