@@ -4,6 +4,9 @@ import { useSyncStore } from '@/store/syncStore'
 import { runDailyPenaltyCheck } from '@/modules/habits/dailyPenaltyCheck'
 import { useApplyBackgroundSettings } from '@/modules/settings/hooks/useApplyBackgroundSettings'
 import { GameEventToaster } from '@/modules/gamification/components/GameEventToaster'
+import { checkAndUnlockAchievements } from '@/modules/gamification/achievements'
+import { gamificationRepository } from '@/data/repositories/gamificationRepository'
+import { habitsRepository } from '@/data/repositories/habitsRepository'
 
 const NAV_ITEMS = [
   { to: '/dashboard', label: 'Главная', icon: '🏠' },
@@ -20,6 +23,13 @@ export function AppShell() {
   useEffect(() => {
     void syncNow()
     void runDailyPenaltyCheck()
+    void (async () => {
+      const [profile, habits] = await Promise.all([
+        gamificationRepository.get(),
+        habitsRepository.list(),
+      ])
+      await checkAndUnlockAchievements({ profile, habits })
+    })()
   }, [syncNow])
 
   return (

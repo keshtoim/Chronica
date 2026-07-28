@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { gamificationRepository } from '@/data/repositories/gamificationRepository'
-import { purchaseReward } from '@/modules/gamification/engine'
+import { purchaseReward, purchaseSkipScroll, SKIP_SCROLL_COST } from '@/modules/gamification/engine'
 import type { GamificationProfile } from '@/data/entities'
 
 interface Props {
@@ -12,6 +12,7 @@ export function RewardsShop({ profile }: Props) {
   const [name, setName] = useState('')
   const [cost, setCost] = useState(50)
   const [error, setError] = useState<string | null>(null)
+  const [scrollError, setScrollError] = useState<string | null>(null)
 
   async function handleAddReward(event: FormEvent) {
     event.preventDefault()
@@ -36,9 +37,42 @@ export function RewardsShop({ profile }: Props) {
     if (!result.ok) setError(result.reason ?? 'Не удалось купить награду')
   }
 
+  async function handlePurchaseSkipScroll() {
+    setScrollError(null)
+    const result = await purchaseSkipScroll()
+    if (!result.ok) setScrollError(result.reason ?? 'Не удалось купить свиток')
+  }
+
   return (
     <div className="rounded-card border border-[var(--color-border)] bg-[var(--color-glass)] p-4 shadow-soft backdrop-blur-md">
       <h2 className="mb-3 font-semibold">Магазин наград</h2>
+
+      <div className="mb-4 rounded-button border border-[var(--color-border)] p-3">
+        <p className="mb-2 text-xs font-medium text-[var(--color-text-muted)]">Торговец</p>
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="text-2xl" aria-hidden="true">
+              📜
+            </span>
+            <div>
+              <p className="text-sm font-medium">Свиток пропуска</p>
+              <p className="text-xs text-[var(--color-text-muted)]">
+                Пропусти день привычки без урона HP · есть: {profile.skipScrolls}
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => void handlePurchaseSkipScroll()}
+            disabled={profile.gold < SKIP_SCROLL_COST}
+            style={{ background: 'var(--gradient-gold)' }}
+            className="rounded-button px-3 py-1 text-xs font-medium text-[var(--color-accent-contrast)] shadow-soft disabled:opacity-40"
+          >
+            Купить · {SKIP_SCROLL_COST} 💰
+          </button>
+        </div>
+        {scrollError && <p className="mt-2 text-xs text-[var(--color-danger)]">{scrollError}</p>}
+      </div>
 
       {profile.rewards.length === 0 ? (
         <p className="text-sm text-[var(--color-text-muted)]">

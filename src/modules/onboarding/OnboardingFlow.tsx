@@ -87,9 +87,7 @@ export function OnboardingFlow() {
           </button>
           <button
             type="button"
-            onClick={() =>
-              isLastStep ? void handleFinish() : setStepIndex((index) => index + 1)
-            }
+            onClick={() => (isLastStep ? void handleFinish() : setStepIndex((index) => index + 1))}
             style={{ background: 'var(--gradient-primary)' }}
             className="rounded-button px-4 py-1.5 text-sm font-medium text-[var(--color-accent-contrast)] shadow-soft"
           >

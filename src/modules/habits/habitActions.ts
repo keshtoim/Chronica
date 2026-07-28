@@ -42,6 +42,9 @@ export async function skipHabitDay(habit: HabitEntity, date: Date = new Date()):
     bestStreak: best,
   })
 
-  const [profile, habits] = await Promise.all([gamificationRepository.get(), habitsRepository.list()])
+  const [profile, habits] = await Promise.all([
+    gamificationRepository.get(),
+    habitsRepository.list(),
+  ])
   await checkAndUnlockAchievements({ profile, habits })
 }

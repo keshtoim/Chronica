@@ -84,15 +84,17 @@ export async function ensureSingletons(): Promise<void> {
       // Профили, созданные до появления какого-либо из этих полей, не содержат их —
       // бэкфиллим всё отсутствующее дефолтами, чтобы новые поля не оставались undefined.
       const defaults = defaultGamificationProfile()
+      const profileRecord = profile as unknown as Record<string, unknown>
+      const defaultsRecord = defaults as unknown as Record<string, unknown>
       const patch: Record<string, unknown> = {}
       for (const key of Object.keys(defaults)) {
         if (key === 'id' || key === 'createdAt') continue
-        if ((profile as Record<string, unknown>)[key] === undefined) {
-          patch[key] = (defaults as Record<string, unknown>)[key]
+        if (profileRecord[key] === undefined) {
+          patch[key] = defaultsRecord[key]
         }
       }
       if (Object.keys(patch).length > 0) {
-        await db.gamificationProfile.update(SINGLETON_ID, patch)
+        await db.gamificationProfile.update(SINGLETON_ID, patch as Partial<GamificationProfile>)
       }
     }
     const settings = await db.appSettings.get(SINGLETON_ID)
