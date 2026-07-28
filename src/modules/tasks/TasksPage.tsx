@@ -68,7 +68,7 @@ export function TasksPage() {
   const activeList = lists.find((list) => list.id === selectedListId)
 
   return (
-    <div className="flex h-full">
+    <div className="flex h-full flex-col md:flex-row">
       <TaskListSidebar lists={lists} selectedListId={selectedListId} onSelect={setSelectedListId} />
 
       <div className="flex min-h-0 flex-1 flex-col">
