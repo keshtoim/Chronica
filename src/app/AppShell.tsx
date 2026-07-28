@@ -30,7 +30,7 @@ export function AppShell() {
       </header>
 
       <div className="flex min-h-0 flex-1">
-        <nav className="flex w-56 shrink-0 flex-col gap-1 border-r border-[var(--color-border)] bg-[var(--color-bg)]/80 p-3 backdrop-blur-sm">
+        <nav className="hidden w-56 shrink-0 flex-col gap-1 border-r border-[var(--color-border)] bg-[var(--color-bg)]/80 p-3 backdrop-blur-sm md:flex">
           {NAV_ITEMS.map((item) => (
             <NavLink
               key={item.to}
@@ -54,6 +54,26 @@ export function AppShell() {
           <Outlet />
         </main>
       </div>
+
+      <nav className="flex shrink-0 items-stretch border-t border-[var(--color-border)] bg-[var(--color-bg)]/80 backdrop-blur-sm md:hidden">
+        {NAV_ITEMS.map((item) => (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            className={({ isActive }) =>
+              [
+                'flex flex-1 flex-col items-center gap-0.5 py-2 text-[10px] font-medium transition-colors',
+                isActive ? 'text-[var(--color-accent)]' : 'text-[var(--color-text-muted)]',
+              ].join(' ')
+            }
+          >
+            <span aria-hidden="true" className="text-lg leading-none">
+              {item.icon}
+            </span>
+            {item.label}
+          </NavLink>
+        ))}
+      </nav>
     </div>
   )
 }

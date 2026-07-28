@@ -35,18 +35,18 @@ export function TaskListSidebar({ lists, selectedListId, onSelect }: Props) {
   }
 
   return (
-    <aside className="flex w-60 shrink-0 flex-col gap-1 overflow-auto border-r border-[var(--color-border)] p-3">
-      <h2 className="px-2 pb-2 text-xs font-semibold tracking-wide text-[var(--color-text-muted)] uppercase">
+    <aside className="flex shrink-0 items-center gap-1 overflow-x-auto border-b border-[var(--color-border)] p-2 md:w-60 md:flex-col md:items-stretch md:overflow-auto md:border-r md:border-b-0 md:p-3">
+      <h2 className="hidden px-2 pb-2 text-xs font-semibold tracking-wide text-[var(--color-text-muted)] uppercase md:block">
         Списки
       </h2>
 
       {lists.map((list) => (
-        <div key={list.id} className="group flex items-center gap-1">
+        <div key={list.id} className="group flex shrink-0 items-center gap-1">
           <button
             type="button"
             onClick={() => onSelect(list.id)}
             className={[
-              'flex-1 truncate rounded-full px-3 py-1.5 text-left text-sm transition-colors',
+              'flex-1 truncate rounded-full px-3 py-1.5 text-left text-sm whitespace-nowrap transition-colors',
               list.id === selectedListId
                 ? 'bg-[var(--color-accent)] text-[var(--color-accent-contrast)]'
                 : 'text-[var(--color-text)] hover:bg-[var(--color-surface-hover)]',
@@ -68,12 +68,12 @@ export function TaskListSidebar({ lists, selectedListId, onSelect }: Props) {
         </div>
       ))}
 
-      <form onSubmit={handleCreate} className="mt-2 px-2">
+      <form onSubmit={handleCreate} className="shrink-0 px-1 md:mt-2 md:w-full md:px-2">
         <input
           value={newListTitle}
           onChange={(event) => setNewListTitle(event.target.value)}
           placeholder="Новый список"
-          className="w-full rounded-full border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-sm outline-none"
+          className="w-36 rounded-full border border-[var(--color-border)] bg-transparent px-3 py-1.5 text-sm outline-none md:w-full"
         />
       </form>
     </aside>
