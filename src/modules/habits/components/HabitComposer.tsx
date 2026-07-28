@@ -34,6 +34,7 @@ export function HabitComposer() {
       frequency:
         frequencyType === 'custom' ? { type: 'custom', daysOfWeek } : { type: frequencyType },
       completions: [],
+      skippedDates: [],
       currentStreak: 0,
       bestStreak: 0,
       color,

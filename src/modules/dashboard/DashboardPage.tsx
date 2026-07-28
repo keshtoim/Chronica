@@ -3,13 +3,11 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useGamificationProfile } from '@/modules/gamification/hooks/useGamificationProfile'
 import { xpToNextLevel } from '@/modules/gamification/engine'
-import { CLASS_DEFS } from '@/modules/gamification/characterClasses'
-import { CharacterStats } from '@/modules/gamification/components/CharacterStats'
 import { RewardsShop } from '@/modules/gamification/components/RewardsShop'
+import { AchievementsPanel } from '@/modules/gamification/components/AchievementsPanel'
 import { useHabits } from '@/modules/habits/hooks/useHabits'
 import { HabitCard } from '@/modules/habits/components/HabitCard'
 import { TodayColumn } from '@/modules/dashboard/components/TodayColumn'
-import { MediaImage } from '@/media/MediaImage'
 import { useGameEventStore } from '@/store/gameEventStore'
 
 const SHADOW_SOFT = '0 4px 20px rgba(99, 102, 241, 0.08)'
@@ -64,7 +62,6 @@ export function DashboardPage() {
   if (!profile) return null
 
   const xpNeeded = xpToNextLevel(profile.level)
-  const classDef = CLASS_DEFS[profile.characterClass]
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-4 p-4">
@@ -73,31 +70,12 @@ export function DashboardPage() {
         transition={{ duration: 0.5 }}
         className="rounded-card-lg border border-[var(--color-border)] bg-[var(--color-glass)] p-5 backdrop-blur-md"
       >
-        <div className="flex items-center gap-4">
-          {profile.photo ? (
-            <MediaImage
-              blobKey={profile.photo.blobKey}
-              alt=""
-              className="h-14 w-14 shrink-0 rounded-full object-cover shadow-soft"
-            />
-          ) : (
-            <span
-              className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-3xl shadow-soft"
-              style={{ background: 'var(--gradient-primary)' }}
-              aria-hidden="true"
-            >
-              {classDef.icon}
-            </span>
-          )}
-          <div className="flex-1">
-            <h1 className="text-lg font-semibold">
-              {profile.nickname} · Уровень {profile.level}
-            </h1>
-            <p className="mb-1.5 text-xs text-[var(--color-text-muted)]">
-              {classDef.name} · {profile.xp} / {xpNeeded} XP
-            </p>
-            <GradientBar value={profile.xp} max={xpNeeded} background="var(--gradient-xp)" />
-          </div>
+        <div>
+          <h1 className="text-lg font-semibold">Уровень {profile.level}</h1>
+          <p className="mb-1.5 text-xs text-[var(--color-text-muted)]">
+            {profile.xp} / {xpNeeded} XP
+          </p>
+          <GradientBar value={profile.xp} max={xpNeeded} background="var(--gradient-xp)" />
         </div>
 
         <div className="mt-5 grid grid-cols-2 gap-4">
@@ -114,11 +92,9 @@ export function DashboardPage() {
             </p>
           </div>
         </div>
-
-        <div className="mt-5">
-          <CharacterStats level={profile.level} characterClass={profile.characterClass} />
-        </div>
       </motion.div>
+
+      <AchievementsPanel profile={profile} habits={habits ?? []} />
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <div className="rounded-card border border-[var(--color-border)] bg-[var(--color-glass)] p-4 shadow-soft backdrop-blur-md">

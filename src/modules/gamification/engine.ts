@@ -1,10 +1,14 @@
 import { gamificationRepository } from '@/data/repositories/gamificationRepository'
+import { habitsRepository } from '@/data/repositories/habitsRepository'
+import { checkAndUnlockAchievements } from '@/modules/gamification/achievements'
 import { useGameEventStore } from '@/store/gameEventStore'
 import type { XpSourceType } from '@/data/entities'
 
 const XP_PER_COMPLETION = 10
 const GOLD_PER_COMPLETION = 5
 const HP_PENALTY_PER_MISSED_DAILY = 10
+/** Цена свитка пропуска у торговца — «очень много золота», порядка 100 выполненных задач. */
+export const SKIP_SCROLL_COST = 500
 
 /** XP, нужный для перехода с уровня level на level + 1 (простая линейная прогрессия). */
 export function xpToNextLevel(level: number): number {
@@ -53,6 +57,12 @@ export async function grantReward(sourceType: XpSourceType, sourceId: string): P
   if (level > profile.level) {
     useGameEventStore.getState().pushEvent('levelup', `Новый уровень: ${level}! 🎉`)
   }
+
+  const [updatedProfile, habits] = await Promise.all([
+    gamificationRepository.get(),
+    habitsRepository.list(),
+  ])
+  await checkAndUnlockAchievements({ profile: updatedProfile, habits })
 }
 
 /** Урон по HP за один пропущенный daily — используется при ежедневной проверке пропусков. */
@@ -70,5 +80,17 @@ export async function purchaseReward(rewardId: string): Promise<{ ok: boolean; r
   if (!reward) return { ok: false, reason: 'Награда не найдена' }
   if (profile.gold < reward.cost) return { ok: false, reason: 'Недостаточно золота' }
   await gamificationRepository.update({ gold: profile.gold - reward.cost })
+  return { ok: true }
+}
+
+/** Покупка свитка пропуска у торговца — расходуется на HabitCard, чтобы закрыть день без урона HP. */
+export async function purchaseSkipScroll(): Promise<{ ok: boolean; reason?: string }> {
+  const profile = await gamificationRepository.get()
+  if (profile.gold < SKIP_SCROLL_COST) return { ok: false, reason: 'Недостаточно золота' }
+  await gamificationRepository.update({
+    gold: profile.gold - SKIP_SCROLL_COST,
+    skipScrolls: profile.skipScrolls + 1,
+  })
+  useGameEventStore.getState().pushEvent('reward', 'Свиток пропуска куплен 📜')
   return { ok: true }
 }

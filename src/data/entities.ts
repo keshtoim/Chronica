@@ -78,6 +78,8 @@ export interface HabitEntity extends BaseEntity {
   title: string
   frequency: HabitFrequency
   completions: HabitCompletion[]
+  /** Даты (тот же формат, что HabitCompletion.date), закрытые «свитком пропуска» вместо выполнения. */
+  skippedDates: string[]
   currentStreak: number
   bestStreak: number
   photo?: MediaRef
@@ -100,13 +102,7 @@ export interface RewardEntity {
   cost: number
 }
 
-/** Полный список классов и их характеристики — src/modules/gamification/characterClasses.ts. */
-export type CharacterClassId = 'warrior' | 'mage' | 'rogue' | 'healer' | 'chronicler' | 'guardian'
-
 export interface GamificationProfile extends BaseEntity {
-  nickname: string
-  photo?: MediaRef
-  characterClass: CharacterClassId
   xp: number
   level: number
   gold: number
@@ -116,6 +112,10 @@ export interface GamificationProfile extends BaseEntity {
   onboardingComplete: boolean
   rewards: RewardEntity[]
   xpLog: XpLogEntry[]
+  /** id разблокированных достижений — src/modules/gamification/achievements.ts. */
+  achievements: string[]
+  /** Куплены у торговца в магазине наград, тратятся на пропуск дня привычки без штрафа. */
+  skipScrolls: number
 }
 
 export interface BackgroundFilters {

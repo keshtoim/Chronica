@@ -23,7 +23,8 @@ export async function runDailyPenaltyCheck(): Promise<void> {
     if (habit.frequency.type !== 'daily') continue
     if (new Date(habit.createdAt) >= yesterday) continue // привычка ещё не существовала вчера
     const done = habit.completions.some((entry) => entry.date === yesterdayKey && entry.count > 0)
-    if (!done) missedCount += 1
+    const skipped = (habit.skippedDates ?? []).includes(yesterdayKey)
+    if (!done && !skipped) missedCount += 1
   }
 
   await applyMissedDailyPenalty(missedCount)

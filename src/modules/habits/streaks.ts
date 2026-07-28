@@ -25,6 +25,8 @@ export function computeStreaks(habit: HabitEntity, referenceDate = new Date()): 
   const doneDates = new Set(
     habit.completions.filter((entry) => entry.count > 0).map((entry) => entry.date),
   )
+  // Дни, закрытые свитком пропуска у торговца, засчитываются наравне с выполнением.
+  const skippedDates = new Set(habit.skippedDates ?? [])
   const today = startOfDay(referenceDate)
 
   let current = 0
@@ -32,7 +34,8 @@ export function computeStreaks(habit: HabitEntity, referenceDate = new Date()): 
   let isFirstDueDay = true
   for (let step = 0; step < 3650; step += 1) {
     if (isDueOn(habit.frequency, cursor)) {
-      const done = doneDates.has(toDateKey(cursor))
+      const key = toDateKey(cursor)
+      const done = doneDates.has(key) || skippedDates.has(key)
       if (done) {
         current += 1
       } else if (isFirstDueDay) {
@@ -50,7 +53,8 @@ export function computeStreaks(habit: HabitEntity, referenceDate = new Date()): 
   let scanCursor = addDays(today, -730)
   for (let step = 0; step < 730; step += 1) {
     if (isDueOn(habit.frequency, scanCursor)) {
-      if (doneDates.has(toDateKey(scanCursor))) {
+      const key = toDateKey(scanCursor)
+      if (doneDates.has(key) || skippedDates.has(key)) {
         running += 1
         best = Math.max(best, running)
       } else {

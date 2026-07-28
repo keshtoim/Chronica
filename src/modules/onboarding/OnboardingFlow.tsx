@@ -1,6 +1,6 @@
 import { useState } from 'react'
+import { gamificationRepository } from '@/data/repositories/gamificationRepository'
 import { useGamificationProfile } from '@/modules/gamification/hooks/useGamificationProfile'
-import { CharacterCreationStep } from '@/modules/onboarding/CharacterCreationStep'
 
 interface ExplainerStep {
   icon: string
@@ -27,16 +27,16 @@ const EXPLAINER_STEPS: ExplainerStep[] = [
   {
     icon: '🔥',
     title: 'Привычки',
-    body: 'Ежедневные, еженедельные или по выбранным дням — со стриками и историей выполнения. Пропущенная ежедневная привычка отнимает HP у персонажа.',
+    body: 'Ежедневные, еженедельные или по выбранным дням — со стриками и историей выполнения. Пропущенная ежедневная привычка отнимает у тебя HP.',
   },
   {
-    icon: '🧙',
-    title: 'Персонаж и награды',
-    body: 'За выполненные задачи и привычки персонаж растёт: опыт, уровень, золото. Золото можно тратить в собственном магазине наград — придумай, чем себя порадовать.',
+    icon: '🏆',
+    title: 'Твой прогресс',
+    body: 'За выполненные задачи и привычки ты сам получаешь опыт, уровни и золото — плюс достижения за реальные результаты. Золото можно тратить в магазине наград, включая свиток пропуска у торговца.',
   },
 ]
 
-const TOTAL_STEPS = EXPLAINER_STEPS.length + 1 // + шаг создания персонажа
+const TOTAL_STEPS = EXPLAINER_STEPS.length
 
 export function OnboardingFlow() {
   const profile = useGamificationProfile()
@@ -44,14 +44,18 @@ export function OnboardingFlow() {
 
   if (!profile) return null
 
-  const isCharacterStep = stepIndex >= EXPLAINER_STEPS.length
   const explainer = EXPLAINER_STEPS[stepIndex]
+  const isLastStep = stepIndex === TOTAL_STEPS - 1
+
+  async function handleFinish() {
+    await gamificationRepository.update({ onboardingComplete: true })
+  }
 
   return (
     <div className="flex h-full items-center justify-center overflow-auto p-4 [padding-top:max(1rem,env(safe-area-inset-top))] [padding-bottom:max(1rem,env(safe-area-inset-bottom))]">
       <div className="flex w-full max-w-lg flex-col gap-4 rounded-card-lg border border-[var(--color-border)] bg-[var(--color-glass)] p-6 shadow-elevated backdrop-blur-md">
         <div className="flex justify-center gap-1.5">
-          {Array.from({ length: TOTAL_STEPS }, (_, index) => (
+          {EXPLAINER_STEPS.map((_, index) => (
             <span
               key={index}
               className={[
@@ -64,37 +68,32 @@ export function OnboardingFlow() {
           ))}
         </div>
 
-        {isCharacterStep ? (
-          <CharacterCreationStep profile={profile} onComplete={() => setStepIndex(0)} />
-        ) : (
-          <div className="flex flex-col gap-3 text-center">
-            <span className="text-5xl" aria-hidden="true">
-              {explainer.icon}
-            </span>
-            <h2 className="text-lg font-medium">{explainer.title}</h2>
-            <p className="text-sm text-[var(--color-text-muted)]">{explainer.body}</p>
-          </div>
-        )}
+        <div className="flex flex-col gap-3 text-center">
+          <span className="text-5xl" aria-hidden="true">
+            {explainer.icon}
+          </span>
+          <h2 className="text-lg font-medium">{explainer.title}</h2>
+          <p className="text-sm text-[var(--color-text-muted)]">{explainer.body}</p>
+        </div>
 
-        {!isCharacterStep && (
-          <div className="flex items-center justify-between">
-            <button
-              type="button"
-              onClick={() => setStepIndex((index) => Math.max(0, index - 1))}
-              disabled={stepIndex === 0}
-              className="rounded-full px-3 py-1.5 text-sm hover:bg-[var(--color-surface-hover)] disabled:opacity-0"
-            >
-              Назад
-            </button>
-            <button
-              type="button"
-              onClick={() => setStepIndex((index) => index + 1)}
-              className="rounded-full bg-[var(--color-accent)] px-4 py-1.5 text-sm font-medium text-[var(--color-accent-contrast)]"
-            >
-              Далее
-            </button>
-          </div>
-        )}
+        <div className="flex items-center justify-between">
+          <button
+            type="button"
+            onClick={() => setStepIndex((index) => Math.max(0, index - 1))}
+            disabled={stepIndex === 0}
+            className="rounded-button px-3 py-1.5 text-sm hover:bg-[var(--color-surface-hover)] disabled:opacity-0"
+          >
+            Назад
+          </button>
+          <button
+            type="button"
+            onClick={() => (isLastStep ? void handleFinish() : setStepIndex((index) => index + 1))}
+            style={{ background: 'var(--gradient-primary)' }}
+            className="rounded-button px-4 py-1.5 text-sm font-medium text-[var(--color-accent-contrast)] shadow-soft"
+          >
+            {isLastStep ? 'Начать' : 'Далее'}
+          </button>
+        </div>
       </div>
     </div>
   )
