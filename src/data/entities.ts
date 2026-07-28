@@ -100,16 +100,20 @@ export interface RewardEntity {
   cost: number
 }
 
+/** Полный список классов и их характеристики — src/modules/gamification/characterClasses.ts. */
+export type CharacterClassId = 'warrior' | 'mage' | 'rogue' | 'healer' | 'chronicler' | 'guardian'
+
 export interface GamificationProfile extends BaseEntity {
+  nickname: string
+  photo?: MediaRef
+  characterClass: CharacterClassId
   xp: number
   level: number
   gold: number
   hp: number
   maxHp: number
-  avatar: {
-    baseId: string
-    unlockedItemIds: string[]
-  }
+  /** Заполняется по завершении приветственного онбординга — гейт в App.tsx. */
+  onboardingComplete: boolean
   rewards: RewardEntity[]
   xpLog: XpLogEntry[]
 }
