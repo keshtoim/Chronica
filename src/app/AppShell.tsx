@@ -3,6 +3,7 @@ import { NavLink, Outlet } from 'react-router-dom'
 import { useSyncStore } from '@/store/syncStore'
 import { runDailyPenaltyCheck } from '@/modules/habits/dailyPenaltyCheck'
 import { useApplyBackgroundSettings } from '@/modules/settings/hooks/useApplyBackgroundSettings'
+import { GameEventToaster } from '@/modules/gamification/components/GameEventToaster'
 
 const NAV_ITEMS = [
   { to: '/dashboard', label: 'Главная', icon: '🏠' },
@@ -74,6 +75,8 @@ export function AppShell() {
           </NavLink>
         ))}
       </nav>
+
+      <GameEventToaster />
     </div>
   )
 }
