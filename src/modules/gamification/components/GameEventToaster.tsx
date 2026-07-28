@@ -10,12 +10,14 @@ const TYPE_STYLES: Record<GameEvent['type'], string> = {
   reward: 'border-[var(--color-accent)] text-[var(--color-accent)]',
   levelup: 'border-transparent px-5 py-2.5 text-base text-[var(--color-accent-contrast)]',
   damage: 'border-[var(--color-danger)] text-[var(--color-danger)]',
+  achievement: 'border-transparent text-[var(--color-accent-contrast)]',
 }
 
 const TYPE_INLINE_STYLE: Partial<
   Record<GameEvent['type'], { background: string; boxShadow: string }>
 > = {
   levelup: { background: 'var(--gradient-primary)', boxShadow: 'var(--shadow-glow)' },
+  achievement: { background: 'var(--gradient-gold)', boxShadow: 'var(--shadow-elevated)' },
 }
 
 /** Смонтирован один раз в AppShell — всплывающие уведомления видны с любой страницы. */

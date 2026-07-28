@@ -47,8 +47,6 @@ export function defaultGamificationProfile(): GamificationProfile {
     id: SINGLETON_ID,
     createdAt: timestamp,
     updatedAt: timestamp,
-    nickname: '',
-    characterClass: 'warrior',
     xp: 0,
     level: 1,
     gold: 0,
@@ -57,6 +55,8 @@ export function defaultGamificationProfile(): GamificationProfile {
     onboardingComplete: false,
     rewards: [],
     xpLog: [],
+    achievements: [],
+    skipScrolls: 0,
   }
 }
 
@@ -80,15 +80,20 @@ export async function ensureSingletons(): Promise<void> {
     const profile = await db.gamificationProfile.get(SINGLETON_ID)
     if (!profile) {
       await db.gamificationProfile.add(defaultGamificationProfile())
-    } else if (profile.characterClass === undefined || profile.onboardingComplete === undefined) {
-      // Профили, созданные до появления персонажа/онбординга, не содержат этих полей —
-      // без бэкфилла characterClass остаётся undefined и роняет CLASS_DEFS[undefined] при рендере.
+    } else {
+      // Профили, созданные до появления какого-либо из этих полей, не содержат их —
+      // бэкфиллим всё отсутствующее дефолтами, чтобы новые поля не оставались undefined.
       const defaults = defaultGamificationProfile()
-      await db.gamificationProfile.update(SINGLETON_ID, {
-        nickname: profile.nickname ?? defaults.nickname,
-        characterClass: profile.characterClass ?? defaults.characterClass,
-        onboardingComplete: profile.onboardingComplete ?? defaults.onboardingComplete,
-      })
+      const patch: Record<string, unknown> = {}
+      for (const key of Object.keys(defaults)) {
+        if (key === 'id' || key === 'createdAt') continue
+        if ((profile as Record<string, unknown>)[key] === undefined) {
+          patch[key] = (defaults as Record<string, unknown>)[key]
+        }
+      }
+      if (Object.keys(patch).length > 0) {
+        await db.gamificationProfile.update(SINGLETON_ID, patch)
+      }
     }
     const settings = await db.appSettings.get(SINGLETON_ID)
     if (!settings) {

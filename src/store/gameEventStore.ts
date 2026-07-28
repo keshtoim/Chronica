@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-export type GameEventType = 'reward' | 'levelup' | 'damage'
+export type GameEventType = 'reward' | 'levelup' | 'damage' | 'achievement'
 
 export interface GameEvent {
   id: string
