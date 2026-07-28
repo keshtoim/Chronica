@@ -15,7 +15,7 @@ function ProgressBar({ value, max, colorVar }: { value: number; max: number; col
     <div className="h-2.5 w-full overflow-hidden rounded-full bg-[var(--color-surface-hover)]">
       <div
         style={{ width: `${percent}%`, backgroundColor: colorVar }}
-        className="h-full rounded-full transition-[width]"
+        className="h-full rounded-full transition-[width] duration-500 ease-out"
       />
     </div>
   )

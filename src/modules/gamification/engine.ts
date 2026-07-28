@@ -1,4 +1,5 @@
 import { gamificationRepository } from '@/data/repositories/gamificationRepository'
+import { useGameEventStore } from '@/store/gameEventStore'
 import type { XpSourceType } from '@/data/entities'
 
 const XP_PER_COMPLETION = 10
@@ -45,6 +46,13 @@ export async function grantReward(sourceType: XpSourceType, sourceId: string): P
       { sourceId, sourceType, amount: XP_PER_COMPLETION, date: new Date().toISOString() },
     ],
   })
+
+  useGameEventStore
+    .getState()
+    .pushEvent('reward', `+${XP_PER_COMPLETION} XP · +${GOLD_PER_COMPLETION} 💰`)
+  if (level > profile.level) {
+    useGameEventStore.getState().pushEvent('levelup', `Новый уровень: ${level}! 🎉`)
+  }
 }
 
 /** Урон по HP за один пропущенный daily — используется при ежедневной проверке пропусков. */
@@ -53,6 +61,7 @@ export async function applyMissedDailyPenalty(missedCount: number): Promise<void
   const profile = await gamificationRepository.get()
   const damage = missedCount * HP_PENALTY_PER_MISSED_DAILY
   await gamificationRepository.update({ hp: Math.max(0, profile.hp - damage) })
+  useGameEventStore.getState().pushEvent('damage', `-${damage} HP · пропущена ежедневная привычка`)
 }
 
 export async function purchaseReward(rewardId: string): Promise<{ ok: boolean; reason?: string }> {
