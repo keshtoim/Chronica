@@ -48,8 +48,8 @@ export function OnboardingFlow() {
   const explainer = EXPLAINER_STEPS[stepIndex]
 
   return (
-    <div className="flex h-full items-center justify-center overflow-auto p-4">
-      <div className="flex w-full max-w-lg flex-col gap-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg)] p-6 shadow-xl">
+    <div className="flex h-full items-center justify-center overflow-auto p-4 [padding-top:max(1rem,env(safe-area-inset-top))] [padding-bottom:max(1rem,env(safe-area-inset-bottom))]">
+      <div className="flex w-full max-w-lg flex-col gap-4 rounded-card-lg border border-[var(--color-border)] bg-[var(--color-glass)] p-6 shadow-elevated backdrop-blur-md">
         <div className="flex justify-center gap-1.5">
           {Array.from({ length: TOTAL_STEPS }, (_, index) => (
             <span

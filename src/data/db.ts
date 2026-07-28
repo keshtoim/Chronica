@@ -80,6 +80,15 @@ export async function ensureSingletons(): Promise<void> {
     const profile = await db.gamificationProfile.get(SINGLETON_ID)
     if (!profile) {
       await db.gamificationProfile.add(defaultGamificationProfile())
+    } else if (profile.characterClass === undefined || profile.onboardingComplete === undefined) {
+      // Профили, созданные до появления персонажа/онбординга, не содержат этих полей —
+      // без бэкфилла characterClass остаётся undefined и роняет CLASS_DEFS[undefined] при рендере.
+      const defaults = defaultGamificationProfile()
+      await db.gamificationProfile.update(SINGLETON_ID, {
+        nickname: profile.nickname ?? defaults.nickname,
+        characterClass: profile.characterClass ?? defaults.characterClass,
+        onboardingComplete: profile.onboardingComplete ?? defaults.onboardingComplete,
+      })
     }
     const settings = await db.appSettings.get(SINGLETON_ID)
     if (!settings) {

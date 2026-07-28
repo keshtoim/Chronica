@@ -24,7 +24,7 @@ export function AppShell() {
 
   return (
     <div className="flex h-full flex-col">
-      <header className="flex h-14 shrink-0 items-center gap-3 border-b border-[var(--color-border)] bg-[var(--color-glass)] px-4 backdrop-blur-md">
+      <header className="flex h-14 shrink-0 items-center gap-3 border-b border-[var(--color-border)] bg-[var(--color-glass)] px-4 backdrop-blur-md [padding-top:env(safe-area-inset-top)] [height:calc(3.5rem+env(safe-area-inset-top))]">
         <span className="text-lg font-semibold">Chronica</span>
         <div className="flex-1" />
         <SyncStatusBadge />
@@ -59,7 +59,7 @@ export function AppShell() {
         </main>
       </div>
 
-      <nav className="flex shrink-0 items-stretch border-t border-[var(--color-border)] bg-[var(--color-glass)] backdrop-blur-md md:hidden">
+      <nav className="flex shrink-0 items-stretch border-t border-[var(--color-border)] bg-[var(--color-glass)] pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden">
         {NAV_ITEMS.map((item) => (
           <NavLink
             key={item.to}
