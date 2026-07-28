@@ -25,9 +25,9 @@ export function TodayColumn() {
   const isEmpty = dueRows.length === 0 && (!occurrences || occurrences.length === 0)
 
   return (
-    <div className="rounded-xl border border-[var(--color-border)] p-4">
+    <div className="rounded-card border border-[var(--color-border)] bg-[var(--color-glass)] p-4 shadow-soft backdrop-blur-md">
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="font-medium">Сегодня</h2>
+        <h2 className="font-semibold">Сегодня</h2>
         <Link to="/tasks" className="text-xs text-[var(--color-accent)] hover:underline">
           Все задачи →
         </Link>
